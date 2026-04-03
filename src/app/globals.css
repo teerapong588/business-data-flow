@@ -49,72 +49,38 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #0a0e1a;
+  --foreground: #e2e8f0;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #e2e8f0;
+  --popover: #0f1629;
+  --popover-foreground: #e2e8f0;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.08);
+  --secondary-foreground: #e2e8f0;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #94a3b8;
+  --accent: rgba(255, 255, 255, 0.08);
+  --accent-foreground: #e2e8f0;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #3b82f6;
+  --chart-1: #3b82f6;
+  --chart-2: #14b8a6;
+  --chart-3: #6366f1;
+  --chart-4: #f59e0b;
+  --chart-5: #a855f7;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #0f1629;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #3b82f6;
 }
 
 @layer base {
@@ -123,8 +89,137 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: #0a0e1a;
   }
   html {
     @apply font-sans;
   }
+}
+
+/* ── React Flow Dark Overrides ── */
+.react-flow__background {
+  background-color: #0a0e1a !important;
+}
+
+.react-flow__minimap {
+  background-color: #0f1629 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+}
+
+.react-flow__controls {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.react-flow__controls button {
+  background-color: rgba(15, 22, 41, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  fill: #94a3b8 !important;
+  color: #94a3b8 !important;
+}
+
+.react-flow__controls button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  fill: #e2e8f0 !important;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* ── Pulse Animation (high criticality nodes) ── */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: var(--node-glow);
+  }
+  50% {
+    box-shadow: var(--node-glow-intense);
+  }
+}
+
+.node-pulse {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* ── Particle Animation on Edges ── */
+@keyframes particle-flow {
+  0% { offset-distance: 0%; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* ── Dimmed state ── */
+.react-flow__node.dimmed {
+  opacity: 0.1 !important;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.react-flow__node:not(.dimmed) {
+  transition: opacity 0.4s ease;
+}
+
+.react-flow__edge.dimmed path,
+.react-flow__edge.dimmed circle {
+  opacity: 0.06 !important;
+  transition: opacity 0.4s ease;
+}
+
+.react-flow__edge:not(.dimmed) path,
+.react-flow__edge:not(.dimmed) circle {
+  transition: opacity 0.4s ease;
+}
+
+/* ── Highlighted state (path tracing) ── */
+.react-flow__edge.highlighted path {
+  filter: brightness(1.4);
+  stroke-width: 2.5 !important;
+}
+
+/* ── Walkthrough ring animation ── */
+@keyframes walkthrough-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.react-flow__node.walkthrough-active > div {
+  animation: walkthrough-ring 1.5s ease-in-out infinite;
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+/* ── Focused node (keyboard nav) ── */
+.react-flow__node.focused > div {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
