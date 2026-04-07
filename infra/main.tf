@@ -4,6 +4,13 @@ provider "google" {
   credentials = file("../service-account.json")
 }
 
+resource "google_artifact_registry_repository" "business_data_flow" {
+  location      = "asia-southeast1"
+  repository_id = "business-data-flow"
+  description   = "Docker images for business-data-flow"
+  format        = "DOCKER"
+}
+
 resource "google_cloud_run_service" "business_data_flow" {
   name     = "business-data-flow"
   location = "asia-southeast1"
