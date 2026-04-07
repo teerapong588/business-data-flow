@@ -18,6 +18,7 @@ export function SchemaExplorer() {
   const nodes = useFlowStore((s) => s.nodes);
   const edges = useFlowStore((s) => s.edges);
   const departments = useFlowStore((s) => s.departments);
+  const functions = useFlowStore((s) => s.functions);
   const editMode = useFlowStore((s) => s.editMode);
   const setEditMode = useFlowStore((s) => s.setEditMode);
   const departmentMap = useDepartmentMap();
@@ -184,6 +185,21 @@ export function SchemaExplorer() {
               {departments.map((dept) => {
                 const deptNodes = nodesByDept.get(dept.id) ?? [];
                 if (deptNodes.length === 0) return null;
+                const deptFunctions = functions.filter((f) => f.departmentId === dept.id);
+
+                // Group nodes by function
+                const nodesByFn = new Map<string, typeof deptNodes>();
+                const ungrouped: typeof deptNodes = [];
+                for (const node of deptNodes) {
+                  const fnId = (node.data as SystemNodeData).function;
+                  if (fnId) {
+                    if (!nodesByFn.has(fnId)) nodesByFn.set(fnId, []);
+                    nodesByFn.get(fnId)!.push(node);
+                  } else {
+                    ungrouped.push(node);
+                  }
+                }
+
                 return (
                   <div key={dept.id} className="mb-3">
                     <div className="px-4 py-1">
@@ -194,7 +210,55 @@ export function SchemaExplorer() {
                         {dept.label}
                       </span>
                     </div>
-                    {deptNodes.map((node) => {
+                    {deptFunctions.map((fn) => {
+                      const fnNodes = nodesByFn.get(fn.id);
+                      if (!fnNodes || fnNodes.length === 0) return null;
+                      return (
+                        <div key={fn.id}>
+                          <div className="px-6 py-1">
+                            <span
+                              className="text-[8px] uppercase tracking-wider font-medium"
+                              style={{ color: `${fn.color}90` }}
+                            >
+                              {fn.label}
+                            </span>
+                          </div>
+                          {fnNodes.map((node) => {
+                            const data = node.data as SystemNodeData;
+                            const schemas = getNodeSchemas(data);
+                            const isSelected = selectedNodeId === node.id;
+                            return (
+                              <button
+                                key={node.id}
+                                onClick={() => selectNode(node.id)}
+                                className={`
+                                  flex items-center justify-between w-full pl-8 pr-4 py-1.5 text-left transition-colors
+                                  ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}
+                                `}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div
+                                    className="w-1 h-1 rounded-full shrink-0"
+                                    style={{ backgroundColor: fn.color }}
+                                  />
+                                  <span
+                                    className={`text-[10px] truncate ${isSelected ? "text-white/90 font-medium" : "text-white/55"}`}
+                                  >
+                                    {data.label}
+                                  </span>
+                                </div>
+                                {schemas.length > 0 && (
+                                  <span className="text-[9px] text-white/25 shrink-0 ml-2">
+                                    {schemas.length}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                    {ungrouped.map((node) => {
                       const data = node.data as SystemNodeData;
                       const schemas = getNodeSchemas(data);
                       const isSelected = selectedNodeId === node.id;
@@ -203,23 +267,23 @@ export function SchemaExplorer() {
                           key={node.id}
                           onClick={() => selectNode(node.id)}
                           className={`
-                            flex items-center justify-between w-full px-4 py-2 text-left transition-colors
+                            flex items-center justify-between w-full px-6 py-1.5 text-left transition-colors
                             ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}
                           `}
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <div
-                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              className="w-1 h-1 rounded-full shrink-0"
                               style={{ backgroundColor: dept.color }}
                             />
                             <span
-                              className={`text-[11px] truncate ${isSelected ? "text-white/90 font-medium" : "text-white/60"}`}
+                              className={`text-[10px] truncate ${isSelected ? "text-white/90 font-medium" : "text-white/55"}`}
                             >
                               {data.label}
                             </span>
                           </div>
                           {schemas.length > 0 && (
-                            <span className="text-[9px] text-white/30 shrink-0 ml-2">
+                            <span className="text-[9px] text-white/25 shrink-0 ml-2">
                               {schemas.length}
                             </span>
                           )}
