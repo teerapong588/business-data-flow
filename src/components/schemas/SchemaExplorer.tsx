@@ -145,13 +145,13 @@ export function SchemaExplorer() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar — system list */}
-        <div className="w-64 border-r border-white/[0.06] flex flex-col">
-          <div className="px-4 py-3 border-b border-white/[0.06]">
+        <div className="w-64 border-r border-white/[0.06] flex flex-col min-h-0">
+          <div className="px-4 py-3 border-b border-white/[0.06] shrink-0">
             <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
               Systems
             </span>
           </div>
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 min-h-0">
             <div className="py-2">
               {departments.map((dept) => {
                 const deptNodes = nodesByDept.get(dept.id) ?? [];
@@ -206,7 +206,7 @@ export function SchemaExplorer() {
         </div>
 
         {/* Center — schema detail */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {selectedNode && selectedData ? (
             <>
               {/* Selected system header */}
@@ -275,13 +275,13 @@ export function SchemaExplorer() {
 
         {/* Right panel — connections */}
         {selectedNode && (
-          <div className="w-72 border-l border-white/[0.06] flex flex-col">
-            <div className="px-4 py-3 border-b border-white/[0.06]">
+          <div className="w-72 border-l border-white/[0.06] flex flex-col min-h-0">
+            <div className="px-4 py-3 border-b border-white/[0.06] shrink-0">
               <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
                 Connections
               </span>
             </div>
-            <ScrollArea className="flex-1">
+            <ScrollArea className="flex-1 min-h-0">
               <EdgeMappingViewer
                 outgoingEdges={connectedEdges.outgoing}
                 incomingEdges={connectedEdges.incoming}
