@@ -45,4 +45,3 @@ service-account.json
 
 # terraform
 infra/.terraform/
-infra/*.tfstate*
