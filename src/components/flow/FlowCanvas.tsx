@@ -35,8 +35,11 @@ import { EditToolbar } from "@/components/panels/EditToolbar";
 import { useFlowStore, useDepartmentMap, useFunctionMap } from "@/store/useFlowStore";
 import { useFlowWalkthrough } from "@/hooks/useFlowWalkthrough";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
+import { FieldTraceOverlay } from "@/components/panels/FieldTraceOverlay";
 import type { SystemNodeData, DataEdgeData, DataFlowEdge } from "@/types/flow";
-import { Eye, Pencil } from "lucide-react";
+import { traceFieldThroughGraph } from "@/lib/schema-utils";
+import { Eye, Pencil, Database } from "lucide-react";
+import Link from "next/link";
 
 function FlowCanvasInner() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -52,9 +55,35 @@ function FlowCanvasInner() {
   const storeUpdateNodePosition = useFlowStore((s) => s.updateNodePosition);
   const storeDeleteNode = useFlowStore((s) => s.deleteNode);
   const storeDeleteEdge = useFlowStore((s) => s.deleteEdge);
+  const tracedField = useFlowStore((s) => s.tracedField);
+  const setTracedField = useFlowStore((s) => s.setTracedField);
   const departmentMap = useDepartmentMap();
   const functionMap = useFunctionMap();
   const isEditMode = editMode === "edit";
+
+  // Field tracing
+  const tracedPath = useMemo(() => {
+    if (!tracedField) return null;
+    return traceFieldThroughGraph(
+      tracedField.nodeId,
+      tracedField.schemaId,
+      tracedField.fieldId,
+      allNodes,
+      allEdges
+    );
+  }, [tracedField, allNodes, allEdges]);
+
+  const tracedNodeIds = useMemo(
+    () => (tracedPath ? new Set(tracedPath.map((p) => p.nodeId)) : null),
+    [tracedPath]
+  );
+  const tracedEdgeIds = useMemo(
+    () =>
+      tracedPath
+        ? new Set(tracedPath.filter((p) => p.edgeId).map((p) => p.edgeId!))
+        : null,
+    [tracedPath]
+  );
 
   const { selectedNodeId, isDetailOpen, onNodeClick, closePanel } =
     useNodeSelection();
@@ -124,6 +153,15 @@ function FlowCanvasInner() {
         }
       }
 
+      // Field tracing: highlight traced nodes, dim others
+      if (tracedNodeIds) {
+        if (tracedNodeIds.has(node.id)) {
+          className = "walkthrough-active";
+        } else {
+          className = "dimmed";
+        }
+      }
+
       return {
         ...node,
         className: className.trim(),
@@ -135,7 +173,7 @@ function FlowCanvasInner() {
         },
       };
     });
-  }, [filteredNodes, freshnessMap, focusedNodeId, walkthrough.isPlaying, walkthrough.activeNodeId, walkthrough.visitedNodeIds, departmentMap, functionMap]);
+  }, [filteredNodes, freshnessMap, focusedNodeId, walkthrough.isPlaying, walkthrough.activeNodeId, walkthrough.visitedNodeIds, departmentMap, functionMap, tracedNodeIds]);
 
   // Enrich edges with walkthrough state
   const enrichedEdges = useMemo(() => {
@@ -152,9 +190,18 @@ function FlowCanvasInner() {
         }
       }
 
+      // Field tracing
+      if (tracedEdgeIds) {
+        if (tracedEdgeIds.has(edge.id)) {
+          className = "highlighted";
+        } else {
+          className = "dimmed";
+        }
+      }
+
       return { ...edge, className: className.trim() };
     });
-  }, [filteredEdges, walkthrough.isPlaying, walkthrough.activeEdgeId, walkthrough.visitedEdgeIds]);
+  }, [filteredEdges, walkthrough.isPlaying, walkthrough.activeEdgeId, walkthrough.visitedEdgeIds, tracedEdgeIds]);
 
   const onNodeMouseEnter = useCallback(
     (_event: React.MouseEvent, node: { id: string }) => {
@@ -333,6 +380,14 @@ function FlowCanvasInner() {
             {isEditMode ? "Editing" : "View"}
           </button>
 
+          <Link
+            href="/schemas"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border border-white/[0.08] bg-white/[0.04] text-white/50 hover:text-white/70 hover:bg-white/[0.06] transition-all duration-200"
+          >
+            <Database size={12} />
+            Schemas
+          </Link>
+
           <ExportButton targetRef={reactFlowWrapper} />
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -439,6 +494,14 @@ function FlowCanvasInner() {
             totalSteps={walkthrough.totalSteps}
             currentNodeLabel={walkthrough.activeNodeLabel}
             onStop={walkthrough.stop}
+          />
+        )}
+
+        {/* Field trace overlay */}
+        {tracedField && tracedPath && (
+          <FieldTraceOverlay
+            tracedPath={tracedPath}
+            onStop={() => setTracedField(null)}
           />
         )}
 

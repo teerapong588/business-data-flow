@@ -11,6 +11,9 @@ import type {
   FlowTypeConfig,
   SystemNodeData,
   DataEdgeData,
+  DataSchema,
+  SchemaField,
+  EdgeFieldMapping,
   EditMode,
   FlowProject,
 } from "@/types/flow";
@@ -73,6 +76,25 @@ interface FlowState {
   addFlowType: (ft: FlowTypeConfig) => void;
   updateFlowType: (id: string, updates: Partial<FlowTypeConfig>) => void;
   deleteFlowType: (id: string) => void;
+
+  // Schema CRUD
+  addSchema: (nodeId: string, schema: DataSchema) => void;
+  updateSchema: (nodeId: string, schemaId: string, updates: Partial<DataSchema>) => void;
+  deleteSchema: (nodeId: string, schemaId: string) => void;
+
+  // Field CRUD
+  addField: (nodeId: string, schemaId: string, field: SchemaField) => void;
+  updateField: (nodeId: string, schemaId: string, fieldId: string, updates: Partial<SchemaField>) => void;
+  deleteField: (nodeId: string, schemaId: string, fieldId: string) => void;
+
+  // Edge field mapping CRUD
+  addFieldMapping: (edgeId: string, mapping: EdgeFieldMapping) => void;
+  updateFieldMapping: (edgeId: string, index: number, mapping: EdgeFieldMapping) => void;
+  deleteFieldMapping: (edgeId: string, index: number) => void;
+
+  // Field tracing
+  tracedField: { nodeId: string; schemaId: string; fieldId: string } | null;
+  setTracedField: (trace: { nodeId: string; schemaId: string; fieldId: string } | null) => void;
 
   // Project management
   setProjectName: (name: string) => void;
@@ -216,6 +238,169 @@ export const useFlowStore = create<FlowState>()(
           flowTypes: state.flowTypes.filter((ft) => ft.id !== id),
         })),
 
+      // ── Schema CRUD ──────────────────────────────────────────────────
+
+      addSchema: (nodeId, schema) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, schemas: [...(n.data.schemas ?? []), schema] } }
+              : n
+          ),
+        })),
+
+      updateSchema: (nodeId, schemaId, updates) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    schemas: (n.data.schemas ?? []).map((s) =>
+                      s.id === schemaId ? { ...s, ...updates } : s
+                    ),
+                  },
+                }
+              : n
+          ),
+        })),
+
+      deleteSchema: (nodeId, schemaId) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, schemas: (n.data.schemas ?? []).filter((s) => s.id !== schemaId) } }
+              : n
+          ),
+          // Cascade: clean edge fieldMappings referencing this schema
+          edges: state.edges.map((e) => {
+            if (e.source !== nodeId && e.target !== nodeId) return e;
+            const data = e.data as DataEdgeData;
+            if (!data?.fieldMappings) return e;
+            return {
+              ...e,
+              data: {
+                ...data,
+                fieldMappings: data.fieldMappings.filter(
+                  (m) => m.sourceSchemaId !== schemaId && m.targetSchemaId !== schemaId
+                ),
+              },
+            } as DataFlowEdge;
+          }),
+        })),
+
+      // ── Field CRUD ────────────────────────────────────────────────────
+
+      addField: (nodeId, schemaId, field) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    schemas: (n.data.schemas ?? []).map((s) =>
+                      s.id === schemaId ? { ...s, fields: [...s.fields, field] } : s
+                    ),
+                  },
+                }
+              : n
+          ),
+        })),
+
+      updateField: (nodeId, schemaId, fieldId, updates) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    schemas: (n.data.schemas ?? []).map((s) =>
+                      s.id === schemaId
+                        ? { ...s, fields: s.fields.map((f) => (f.id === fieldId ? { ...f, ...updates } : f)) }
+                        : s
+                    ),
+                  },
+                }
+              : n
+          ),
+        })),
+
+      deleteField: (nodeId, schemaId, fieldId) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    schemas: (n.data.schemas ?? []).map((s) =>
+                      s.id === schemaId
+                        ? { ...s, fields: s.fields.filter((f) => f.id !== fieldId) }
+                        : s
+                    ),
+                  },
+                }
+              : n
+          ),
+        })),
+
+      // ── Edge Field Mapping CRUD ───────────────────────────────────────
+
+      addFieldMapping: (edgeId, mapping) =>
+        set((state) => ({
+          edges: state.edges.map((e) =>
+            e.id === edgeId
+              ? ({
+                  ...e,
+                  data: {
+                    ...e.data,
+                    fieldMappings: [...((e.data as DataEdgeData)?.fieldMappings ?? []), mapping],
+                  },
+                } as DataFlowEdge)
+              : e
+          ),
+        })),
+
+      updateFieldMapping: (edgeId, index, mapping) =>
+        set((state) => ({
+          edges: state.edges.map((e) =>
+            e.id === edgeId
+              ? ({
+                  ...e,
+                  data: {
+                    ...e.data,
+                    fieldMappings: ((e.data as DataEdgeData)?.fieldMappings ?? []).map((m, i) =>
+                      i === index ? mapping : m
+                    ),
+                  },
+                } as DataFlowEdge)
+              : e
+          ),
+        })),
+
+      deleteFieldMapping: (edgeId, index) =>
+        set((state) => ({
+          edges: state.edges.map((e) =>
+            e.id === edgeId
+              ? ({
+                  ...e,
+                  data: {
+                    ...e.data,
+                    fieldMappings: ((e.data as DataEdgeData)?.fieldMappings ?? []).filter((_, i) => i !== index),
+                  },
+                } as DataFlowEdge)
+              : e
+          ),
+        })),
+
+      // ── Field Tracing ─────────────────────────────────────────────────
+
+      tracedField: null,
+      setTracedField: (trace) => set({ tracedField: trace }),
+
       // ── Project Management ──────────────────────────────────────────
 
       setProjectName: (name) => set({ projectName: name }),
@@ -279,7 +464,7 @@ export const useFlowStore = create<FlowState>()(
     }),
     {
       name: "flow-project",
-      version: 8,
+      version: 9,
       migrate: (_persistedState, _version) => ({
         projectId: ASSET_MANAGEMENT_TEMPLATE.id,
         projectName: ASSET_MANAGEMENT_TEMPLATE.name,

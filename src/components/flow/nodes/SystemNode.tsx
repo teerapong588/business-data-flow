@@ -4,6 +4,7 @@ import React, { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { Badge } from "@/components/ui/badge";
 import { SystemNodeData, DepartmentConfig, BusinessFunctionConfig } from "@/types/flow";
+import { getNodeSchemas } from "@/lib/schema-utils";
 import { FreshnessDot } from "./FreshnessDot";
 import type { FreshnessInfo } from "@/types/flow";
 import {
@@ -44,6 +45,8 @@ function SystemNodeComponent({ data, selected }: NodeProps) {
   const color = dept?.color ?? "#64748b";
   const fnColor = fn?.color ?? color;
   const isHighCriticality = nodeData.criticality === "high";
+  const schemas = getNodeSchemas(nodeData);
+  const schemaCount = schemas.length;
 
   return (
     <>
@@ -117,9 +120,16 @@ function SystemNodeComponent({ data, selected }: NodeProps) {
               {fn.label}
             </Badge>
           )}
+          {/* Schema count */}
+          {schemaCount > 0 && (
+            <span className="flex items-center gap-0.5 ml-auto mr-1 text-[7px] text-white/30">
+              <Database size={8} className="text-white/25" />
+              {schemaCount}
+            </span>
+          )}
           {/* Criticality dot */}
           <div
-            className="w-1.5 h-1.5 rounded-full ml-auto"
+            className={`w-1.5 h-1.5 rounded-full ${schemaCount === 0 ? "ml-auto" : ""}`}
             style={{
               backgroundColor:
                 nodeData.criticality === "high"

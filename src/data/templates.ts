@@ -293,6 +293,44 @@ const templateNodes: SystemFlowNode[] = [
       description:
         "Central hub for trade order creation, management, and allocation across all strategies.",
       dataTypes: ["Trade Orders", "Allocations", "Compliance Results"],
+      schemas: [
+        {
+          id: "trade-order",
+          name: "Trade Order",
+          fields: [
+            { id: "order_id", name: "Order ID", type: "string", required: true },
+            { id: "symbol", name: "Symbol", type: "string", required: true },
+            { id: "side", name: "Side", type: "string", required: true },
+            { id: "quantity", name: "Quantity", type: "number", required: true },
+            { id: "price", name: "Price", type: "number" },
+            { id: "order_type", name: "Order Type", type: "string", required: true },
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "timestamp", name: "Timestamp", type: "date", required: true },
+            { id: "status", name: "Status", type: "string", required: true },
+          ],
+        },
+        {
+          id: "allocation",
+          name: "Allocation",
+          fields: [
+            { id: "alloc_id", name: "Allocation ID", type: "string", required: true },
+            { id: "order_id", name: "Order ID", type: "string", required: true },
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "quantity", name: "Quantity", type: "number", required: true },
+            { id: "account_id", name: "Account ID", type: "string", required: true },
+          ],
+        },
+        {
+          id: "compliance-result",
+          name: "Compliance Result",
+          fields: [
+            { id: "order_id", name: "Order ID", type: "string", required: true },
+            { id: "rule_id", name: "Rule ID", type: "string", required: true },
+            { id: "status", name: "Status", type: "string", required: true },
+            { id: "breach_detail", name: "Breach Detail", type: "string" },
+          ],
+        },
+      ],
       schedule: "Real-time",
       protocol: "FIX 4.4 / REST API",
       criticality: "high",
@@ -312,6 +350,32 @@ const templateNodes: SystemFlowNode[] = [
       description:
         "Smart order routing and algorithmic execution across venues and dark pools.",
       dataTypes: ["Execution Reports", "Fill Data", "TCA Metrics"],
+      schemas: [
+        {
+          id: "execution-order",
+          name: "Execution Order",
+          fields: [
+            { id: "order_id", name: "Order ID", type: "string", required: true },
+            { id: "symbol", name: "Symbol", type: "string", required: true },
+            { id: "side", name: "Side", type: "string", required: true },
+            { id: "quantity", name: "Quantity", type: "number", required: true },
+            { id: "exec_venue", name: "Execution Venue", type: "string" },
+            { id: "algo_type", name: "Algorithm Type", type: "string" },
+          ],
+        },
+        {
+          id: "fill",
+          name: "Fill",
+          fields: [
+            { id: "fill_id", name: "Fill ID", type: "string", required: true },
+            { id: "order_id", name: "Order ID", type: "string", required: true },
+            { id: "exec_price", name: "Execution Price", type: "number", required: true },
+            { id: "exec_qty", name: "Executed Quantity", type: "number", required: true },
+            { id: "venue", name: "Venue", type: "string", required: true },
+            { id: "timestamp", name: "Timestamp", type: "date", required: true },
+          ],
+        },
+      ],
       schedule: "Real-time",
       protocol: "FIX 4.4",
       criticality: "high",
@@ -375,6 +439,29 @@ const templateNodes: SystemFlowNode[] = [
       description:
         "VaR calculation, stress testing, exposure analytics, and factor risk decomposition.",
       dataTypes: ["VaR Reports", "Stress Test Results", "Exposure Data"],
+      schemas: [
+        {
+          id: "var-report",
+          name: "VaR Report",
+          fields: [
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "var_95", name: "VaR 95%", type: "number", required: true },
+            { id: "var_99", name: "VaR 99%", type: "number", required: true },
+            { id: "calc_date", name: "Calculation Date", type: "date", required: true },
+          ],
+        },
+        {
+          id: "exposure",
+          name: "Exposure Data",
+          fields: [
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "asset_class", name: "Asset Class", type: "string", required: true },
+            { id: "gross_exposure", name: "Gross Exposure", type: "number", required: true },
+            { id: "net_exposure", name: "Net Exposure", type: "number", required: true },
+            { id: "currency", name: "Currency", type: "string", required: true },
+          ],
+        },
+      ],
       schedule: "Real-time + EOD batch",
       protocol: "REST API / Batch Files",
       criticality: "high",
@@ -459,6 +546,21 @@ const templateNodes: SystemFlowNode[] = [
       description:
         "Settlement instruction generation, fail management, and delivery-vs-payment processing.",
       dataTypes: ["Settlement Instructions", "Fail Reports", "DVP Status"],
+      schemas: [
+        {
+          id: "settlement-instruction",
+          name: "Settlement Instruction",
+          fields: [
+            { id: "settle_id", name: "Settlement ID", type: "string", required: true },
+            { id: "trade_id", name: "Trade ID", type: "string", required: true },
+            { id: "settle_date", name: "Settlement Date", type: "date", required: true },
+            { id: "amount", name: "Amount", type: "number", required: true },
+            { id: "currency", name: "Currency", type: "string", required: true },
+            { id: "counterparty", name: "Counterparty", type: "string", required: true },
+            { id: "status", name: "Status", type: "string", required: true },
+          ],
+        },
+      ],
       schedule: "Real-time (T+1/T+2)",
       protocol: "SWIFT MT5xx / ISO 20022",
       criticality: "high",
@@ -480,6 +582,30 @@ const templateNodes: SystemFlowNode[] = [
       description:
         "General ledger, fund-level bookkeeping, expense accruals, and income allocation.",
       dataTypes: ["GL Balances", "Trial Balance", "Expense Accruals"],
+      schemas: [
+        {
+          id: "gl-balance",
+          name: "GL Balance",
+          fields: [
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "account_code", name: "Account Code", type: "string", required: true },
+            { id: "balance", name: "Balance", type: "number", required: true },
+            { id: "currency", name: "Currency", type: "string", required: true },
+            { id: "as_of_date", name: "As of Date", type: "date", required: true },
+          ],
+        },
+        {
+          id: "expense-accrual",
+          name: "Expense Accrual",
+          fields: [
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "expense_type", name: "Expense Type", type: "string", required: true },
+            { id: "accrued_amount", name: "Accrued Amount", type: "number", required: true },
+            { id: "period_start", name: "Period Start", type: "date", required: true },
+            { id: "period_end", name: "Period End", type: "date", required: true },
+          ],
+        },
+      ],
       schedule: "Daily batch (T+1)",
       protocol: "Batch / REST API",
       criticality: "high",
@@ -500,10 +626,31 @@ const templateNodes: SystemFlowNode[] = [
       owner: "Fund Accounting - NAV",
       description:
         "Daily Net Asset Value computation, pricing validation, and NAV dissemination.",
-      dataTypes: [
-        "NAV per Share",
-        "Component Valuations",
-        "Pricing Exceptions",
+      dataTypes: ["NAV per Share", "Component Valuations", "Pricing Exceptions"],
+      schemas: [
+        {
+          id: "nav-per-share",
+          name: "NAV per Share",
+          fields: [
+            { id: "fund_id", name: "Fund ID", type: "string", required: true },
+            { id: "nav_date", name: "NAV Date", type: "date", required: true },
+            { id: "nav_value", name: "NAV Value", type: "number", required: true },
+            { id: "shares_outstanding", name: "Shares Outstanding", type: "number", required: true },
+            { id: "nav_per_share", name: "NAV per Share", type: "number", required: true },
+            { id: "currency", name: "Currency", type: "string", required: true },
+          ],
+        },
+        {
+          id: "pricing-exception",
+          name: "Pricing Exception",
+          fields: [
+            { id: "security_id", name: "Security ID", type: "string", required: true },
+            { id: "exception_type", name: "Exception Type", type: "string", required: true },
+            { id: "stale_price", name: "Stale Price", type: "number" },
+            { id: "new_price", name: "New Price", type: "number" },
+            { id: "resolution", name: "Resolution", type: "string" },
+          ],
+        },
       ],
       schedule: "Daily batch 18:00 UTC",
       protocol: "Internal Batch",
@@ -669,9 +816,9 @@ const templateNodes: SystemFlowNode[] = [
 const templateEdges: DataFlowEdge[] = [
   // Trade Lifecycle
   { id: "e-market-data-oms", source: "market-data", target: "oms", data: { label: "Market Data \u2192 OMS", dataDescription: "Real-time pricing data for order management", frequency: "Real-time streaming", protocol: "Bloomberg B-PIPE", flowTypes: ["trade-lifecycle"] } },
-  { id: "e-oms-compliance", source: "oms", target: "pre-trade-compliance", data: { label: "Orders \u2192 Compliance", dataDescription: "Trade orders for pre-trade compliance validation", frequency: "Real-time (per order)", protocol: "Internal API", flowTypes: ["trade-lifecycle", "compliance-monitoring"] } },
+  { id: "e-oms-compliance", source: "oms", target: "pre-trade-compliance", data: { label: "Orders \u2192 Compliance", dataDescription: "Trade orders for pre-trade compliance validation", frequency: "Real-time (per order)", protocol: "Internal API", flowTypes: ["trade-lifecycle", "compliance-monitoring"], fieldMappings: [{ sourceSchemaId: "trade-order", sourceFieldIds: ["order_id", "symbol", "side", "quantity", "price", "fund_id"] }] } },
   { id: "e-compliance-oms", source: "pre-trade-compliance", target: "oms", data: { label: "Compliance \u2192 OMS", dataDescription: "Approval/rejection results back to OMS", frequency: "Real-time", protocol: "Internal API", flowTypes: ["trade-lifecycle", "compliance-monitoring"] } },
-  { id: "e-oms-ems", source: "oms", target: "ems", data: { label: "Orders \u2192 Execution", dataDescription: "Approved orders routed for execution", frequency: "Real-time", protocol: "FIX 4.4", flowTypes: ["trade-lifecycle"] } },
+  { id: "e-oms-ems", source: "oms", target: "ems", data: { label: "Orders \u2192 Execution", dataDescription: "Approved orders routed for execution", frequency: "Real-time", protocol: "FIX 4.4", flowTypes: ["trade-lifecycle"], fieldMappings: [{ sourceSchemaId: "trade-order", sourceFieldIds: ["order_id", "symbol", "side", "quantity", "price", "order_type"], targetSchemaId: "execution-order" }] } },
   { id: "e-ems-broker", source: "ems", target: "broker-dealer", data: { label: "Execution \u2192 Broker", dataDescription: "Order routing to sell-side for execution", frequency: "Real-time", protocol: "FIX 4.4 / FIX 5.0", flowTypes: ["trade-lifecycle"] } },
   { id: "e-broker-ems", source: "broker-dealer", target: "ems", data: { label: "Fills \u2192 EMS", dataDescription: "Execution reports and fill confirmations", frequency: "Real-time", protocol: "FIX 4.4", flowTypes: ["trade-lifecycle"] } },
   { id: "e-ems-matching", source: "ems", target: "trade-matching", data: { label: "Trades \u2192 Matching", dataDescription: "Executed trade details for post-trade matching", frequency: "Real-time (T+0)", protocol: "DTCC CTM", flowTypes: ["trade-lifecycle"] } },
@@ -681,10 +828,10 @@ const templateEdges: DataFlowEdge[] = [
 
   // NAV Calculation
   { id: "e-pricing-nav", source: "pricing-service", target: "nav-engine", data: { label: "EOD Prices \u2192 NAV", dataDescription: "End-of-day evaluated prices for NAV calculation", frequency: "Daily batch 17:00 UTC", protocol: "SFTP", flowTypes: ["nav-calculation"] } },
-  { id: "e-settlement-accounting", source: "settlement", target: "fund-accounting", data: { label: "Settled Trades \u2192 Accounting", dataDescription: "Settled trade details for general ledger posting", frequency: "Daily (T+1)", protocol: "Internal Batch", flowTypes: ["nav-calculation"] } },
+  { id: "e-settlement-accounting", source: "settlement", target: "fund-accounting", data: { label: "Settled Trades \u2192 Accounting", dataDescription: "Settled trade details for general ledger posting", frequency: "Daily (T+1)", protocol: "Internal Batch", flowTypes: ["nav-calculation"], fieldMappings: [{ sourceSchemaId: "settlement-instruction", sourceFieldIds: ["settle_id", "trade_id", "amount", "currency", "settle_date"], targetSchemaId: "gl-balance" }] } },
   { id: "e-ca-accounting", source: "corporate-actions", target: "fund-accounting", data: { label: "Corp Actions \u2192 Accounting", dataDescription: "Dividend accruals, stock splits, and CA processing results", frequency: "Event-driven", protocol: "Internal", flowTypes: ["nav-calculation"] } },
-  { id: "e-accounting-nav", source: "fund-accounting", target: "nav-engine", data: { label: "GL Balances \u2192 NAV", dataDescription: "Fund-level balances and expense accruals for NAV", frequency: "Daily", protocol: "Internal Batch", flowTypes: ["nav-calculation"] } },
-  { id: "e-nav-client-reporting", source: "nav-engine", target: "client-reporting", data: { label: "NAV \u2192 Client Reports", dataDescription: "NAV per share data for investor reports", frequency: "Daily", protocol: "Internal", flowTypes: ["nav-calculation", "client-reporting"] } },
+  { id: "e-accounting-nav", source: "fund-accounting", target: "nav-engine", data: { label: "GL Balances \u2192 NAV", dataDescription: "Fund-level balances and expense accruals for NAV", frequency: "Daily", protocol: "Internal Batch", flowTypes: ["nav-calculation"], fieldMappings: [{ sourceSchemaId: "gl-balance", sourceFieldIds: ["fund_id", "balance", "currency", "as_of_date"], targetSchemaId: "nav-per-share" }, { sourceSchemaId: "expense-accrual", sourceFieldIds: [] }] } },
+  { id: "e-nav-client-reporting", source: "nav-engine", target: "client-reporting", data: { label: "NAV \u2192 Client Reports", dataDescription: "NAV per share data for investor reports", frequency: "Daily", protocol: "Internal", flowTypes: ["nav-calculation", "client-reporting"], fieldMappings: [{ sourceSchemaId: "nav-per-share", sourceFieldIds: ["fund_id", "nav_date", "nav_per_share", "currency"] }] } },
   { id: "e-nav-regulatory", source: "nav-engine", target: "regulatory-reporting", data: { label: "NAV \u2192 Regulatory", dataDescription: "Fund valuations for regulatory filings", frequency: "Daily / Periodic", protocol: "Internal", flowTypes: ["nav-calculation", "compliance-monitoring"] } },
   { id: "e-custodian-ca", source: "custodian", target: "corporate-actions", data: { label: "CA Notifications", dataDescription: "Corporate action event notifications from custodian", frequency: "Event-driven", protocol: "SWIFT MT564", flowTypes: ["nav-calculation"] } },
 

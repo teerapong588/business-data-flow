@@ -7,6 +7,26 @@ export type FlowType = string;
 
 export type EditMode = "view" | "edit";
 
+export interface SchemaField {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+  required?: boolean;
+}
+
+export interface DataSchema {
+  id: string;
+  name: string;
+  fields: SchemaField[];
+}
+
+export interface EdgeFieldMapping {
+  sourceSchemaId: string;
+  sourceFieldIds: string[];
+  targetSchemaId?: string;
+}
+
 export interface SystemNodeData {
   label: string;
   department: Department;
@@ -15,6 +35,7 @@ export interface SystemNodeData {
   owner: string;
   description: string;
   dataTypes: string[];
+  schemas?: DataSchema[];
   schedule: string;
   protocol: string;
   criticality: "high" | "medium" | "low";
@@ -28,6 +49,7 @@ export interface DataEdgeData {
   frequency: string;
   protocol: string;
   flowTypes: FlowType[];
+  fieldMappings?: EdgeFieldMapping[];
   [key: string]: unknown;
 }
 
