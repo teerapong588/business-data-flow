@@ -6,6 +6,13 @@ import { computeSwimLanes, computeFunctionZones } from "@/lib/swim-lanes";
 import { useFlowStore } from "@/store/useFlowStore";
 import type { SystemFlowNode } from "@/types/flow";
 
+function hexToRgb(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `${r},${g},${b}`;
+}
+
 export function SwimLaneBackground() {
   const nodes = useNodes();
   const { x, y, zoom } = useViewport();
@@ -52,7 +59,7 @@ export function SwimLaneBackground() {
   return (
     <div
       className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: -1 }}
+      style={{ zIndex: 0 }}
     >
       <div
         style={{
@@ -61,51 +68,56 @@ export function SwimLaneBackground() {
         }}
       >
         {/* Department lanes (outer) */}
-        {lanes.map((lane) => (
-          <div
-            key={`dept-${lane.department}`}
-            className="absolute rounded-2xl"
-            style={{
-              left: lane.bounds.x,
-              top: lane.bounds.y,
-              width: lane.bounds.width,
-              height: lane.bounds.height,
-              backgroundColor: `${lane.color}20`,
-              border: `2px solid ${lane.color}50`,
-              boxShadow: `0 0 20px ${lane.color}10`,
-            }}
-          >
-            <span
-              className="absolute top-3 left-4 text-[12px] uppercase tracking-widest font-bold"
-              style={{ color: `${lane.color}aa` }}
+        {lanes.map((lane) => {
+          const rgb = hexToRgb(lane.color);
+          return (
+            <div
+              key={`dept-${lane.department}`}
+              className="absolute rounded-2xl"
+              style={{
+                left: lane.bounds.x,
+                top: lane.bounds.y,
+                width: lane.bounds.width,
+                height: lane.bounds.height,
+                backgroundColor: `rgba(${rgb},0.07)`,
+                border: `2px solid rgba(${rgb},0.3)`,
+              }}
             >
-              {lane.label}
-            </span>
-          </div>
-        ))}
+              <span
+                className="absolute top-3 left-4 text-[13px] uppercase tracking-widest font-bold select-none"
+                style={{ color: `rgba(${rgb},0.65)` }}
+              >
+                {lane.label}
+              </span>
+            </div>
+          );
+        })}
 
         {/* Function zones (inner) */}
-        {zones.map((zone) => (
-          <div
-            key={`fn-${zone.functionId}`}
-            className="absolute rounded-lg"
-            style={{
-              left: zone.bounds.x,
-              top: zone.bounds.y,
-              width: zone.bounds.width,
-              height: zone.bounds.height,
-              backgroundColor: `${zone.color}15`,
-              border: `1px solid ${zone.color}40`,
-            }}
-          >
-            <span
-              className="absolute top-2 left-3 text-[9px] uppercase tracking-wider font-semibold"
-              style={{ color: `${zone.color}80` }}
+        {zones.map((zone) => {
+          const rgb = hexToRgb(zone.color);
+          return (
+            <div
+              key={`fn-${zone.functionId}`}
+              className="absolute rounded-lg"
+              style={{
+                left: zone.bounds.x,
+                top: zone.bounds.y,
+                width: zone.bounds.width,
+                height: zone.bounds.height,
+                backgroundColor: `rgba(${rgb},0.05)`,
+                border: `1px solid rgba(${rgb},0.2)`,
+              }}
             >
-              {zone.label}
-            </span>
-          </div>
-        ))}
+              <span
+                className="absolute top-2 left-3 text-[10px] uppercase tracking-wider font-semibold select-none"
+                style={{ color: `rgba(${rgb},0.5)` }}
+              >
+                {zone.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
