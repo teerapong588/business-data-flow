@@ -95,6 +95,7 @@ function EdgeEditFormInner({
   const [dataDescription, setDataDescription] = useState(data.dataDescription ?? "");
   const [frequency, setFrequency] = useState(data.frequency ?? "");
   const [protocol, setProtocol] = useState(data.protocol ?? "");
+  const [owner, setOwner] = useState(data.owner ?? "");
   const [selectedFlowTypes, setSelectedFlowTypes] = useState<string[]>(data.flowTypes ?? []);
 
   const toggleFlowType = (ftId: string) => {
@@ -109,10 +110,11 @@ function EdgeEditFormInner({
       dataDescription: dataDescription.trim(),
       frequency: frequency.trim(),
       protocol: protocol.trim(),
+      owner: owner.trim(),
       flowTypes: selectedFlowTypes,
     });
     onClose();
-  }, [edgeId, label, dataDescription, frequency, protocol, selectedFlowTypes, updateEdge, onClose]);
+  }, [edgeId, label, dataDescription, frequency, protocol, owner, selectedFlowTypes, updateEdge, onClose]);
 
   const handleDelete = () => {
     deleteEdge(edgeId);
@@ -194,6 +196,17 @@ function EdgeEditFormInner({
                 value={protocol}
                 onChange={(e) => setProtocol(e.target.value)}
                 placeholder="e.g., FIX 4.4, REST API"
+                className="mt-1 bg-white/[0.04] border-white/[0.08] text-white/80 text-xs"
+              />
+            </div>
+
+            {/* Owner */}
+            <div>
+              <Label className="text-[10px] text-white/50 uppercase tracking-wider">Owner / Responsible</Label>
+              <Input
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+                placeholder="e.g., Trading Desk, John Smith, IT Ops"
                 className="mt-1 bg-white/[0.04] border-white/[0.08] text-white/80 text-xs"
               />
             </div>

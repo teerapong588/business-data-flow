@@ -85,9 +85,6 @@ export function traceFieldThroughGraph(
             targetSchemaId = mapping.targetSchemaId ?? schemaId;
           }
         }
-      } else {
-        // No mappings defined — assume all data flows through
-        carries = true;
       }
 
       if (carries) {
@@ -133,8 +130,6 @@ export function traceFieldThroughGraph(
             carries = true;
           }
         }
-      } else {
-        carries = true;
       }
 
       if (carries) {

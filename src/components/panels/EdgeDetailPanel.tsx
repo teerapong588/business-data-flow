@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFlowStore, useDepartmentMap } from "@/store/useFlowStore";
 import { EdgeEditForm } from "./EdgeEditForm";
 import type { DataEdgeData, SystemNodeData } from "@/types/flow";
-import { ArrowRight, Clock, Radio } from "lucide-react";
+import { ArrowRight, Clock, Radio, User } from "lucide-react";
 
 interface EdgeDetailPanelProps {
   edgeId: string | null;
@@ -73,6 +73,7 @@ export function EdgeDetailPanel({ edgeId, open, onClose }: EdgeDetailPanelProps)
           <div className="space-y-4 mb-5">
             <MetaRow icon={Clock} label="Frequency" value={data.frequency} />
             <MetaRow icon={Radio} label="Protocol" value={data.protocol} />
+            {data.owner && <MetaRow icon={User} label="Owner / Responsible" value={data.owner} />}
           </div>
 
           <Separator className="bg-white/[0.06] mb-5" />

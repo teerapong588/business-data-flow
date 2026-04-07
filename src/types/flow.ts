@@ -48,6 +48,7 @@ export interface DataEdgeData {
   dataDescription: string;
   frequency: string;
   protocol: string;
+  owner?: string;
   flowTypes: FlowType[];
   fieldMappings?: EdgeFieldMapping[];
   [key: string]: unknown;
