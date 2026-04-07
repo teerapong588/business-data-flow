@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { SystemNodeData, DataEdgeData } from "@/types/flow";
-import { ArrowLeft, Search, Database } from "lucide-react";
+import { ArrowLeft, Search, Database, Plus } from "lucide-react";
 import Link from "next/link";
 
 export function SchemaExplorer() {
@@ -253,14 +253,21 @@ export function SchemaExplorer() {
                         editable={editMode === "edit"}
                       />
                     ))}
+                    {editMode === "edit" && (
+                      <AddSchemaButton nodeId={selectedNodeId!} />
+                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-16 text-white/30">
                     <Database size={32} className="mb-3" />
                     <p className="text-sm">No schemas defined</p>
-                    <p className="text-[11px] mt-1">
-                      Switch to edit mode to add schemas
-                    </p>
+                    {editMode === "edit" ? (
+                      <AddSchemaButton nodeId={selectedNodeId!} />
+                    ) : (
+                      <p className="text-[11px] mt-1">
+                        Switch to edit mode to add schemas
+                      </p>
+                    )}
                   </div>
                 )}
               </ScrollArea>
@@ -292,6 +299,58 @@ export function SchemaExplorer() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function AddSchemaButton({ nodeId }: { nodeId: string }) {
+  const addSchema = useFlowStore((s) => s.addSchema);
+  const [adding, setAdding] = useState(false);
+  const [name, setName] = useState("");
+
+  const handleAdd = () => {
+    if (!name.trim()) return;
+    const id = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    addSchema(nodeId, { id: `${id}-${Date.now()}`, name: name.trim(), fields: [] });
+    setName("");
+    setAdding(false);
+  };
+
+  if (!adding) {
+    return (
+      <button
+        onClick={() => setAdding(true)}
+        className="flex items-center gap-1.5 px-3 py-2 mt-2 rounded-lg text-[10px] text-blue-400 bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+      >
+        <Plus size={10} />
+        Add Schema
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+        placeholder="Schema name..."
+        className="flex-1 text-[11px] text-white/70 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 outline-none focus:border-blue-400/50 placeholder:text-white/20"
+        autoFocus
+      />
+      <button
+        onClick={handleAdd}
+        disabled={!name.trim()}
+        className="px-3 py-2 rounded-lg text-[10px] text-blue-400 bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-colors disabled:opacity-30"
+      >
+        Add
+      </button>
+      <button
+        onClick={() => { setAdding(false); setName(""); }}
+        className="px-2 py-2 rounded-lg text-[10px] text-white/40 hover:text-white/60 transition-colors"
+      >
+        Cancel
+      </button>
     </div>
   );
 }
