@@ -258,7 +258,7 @@ export const useFlowStore = create<FlowState>()(
                   ...n,
                   data: {
                     ...n.data,
-                    schemas: (n.data.schemas ?? []).map((s) =>
+                    schemas: getNodeSchemas(n.data as SystemNodeData).map((s) =>
                       s.id === schemaId ? { ...s, ...updates } : s
                     ),
                   },
@@ -271,7 +271,7 @@ export const useFlowStore = create<FlowState>()(
         set((state) => ({
           nodes: state.nodes.map((n) =>
             n.id === nodeId
-              ? { ...n, data: { ...n.data, schemas: (n.data.schemas ?? []).filter((s) => s.id !== schemaId) } }
+              ? { ...n, data: { ...n.data, schemas: getNodeSchemas(n.data as SystemNodeData).filter((s) => s.id !== schemaId) } }
               : n
           ),
           // Cascade: clean edge fieldMappings referencing this schema
@@ -301,7 +301,7 @@ export const useFlowStore = create<FlowState>()(
                   ...n,
                   data: {
                     ...n.data,
-                    schemas: (n.data.schemas ?? []).map((s) =>
+                    schemas: getNodeSchemas(n.data as SystemNodeData).map((s) =>
                       s.id === schemaId ? { ...s, fields: [...s.fields, field] } : s
                     ),
                   },
@@ -318,7 +318,7 @@ export const useFlowStore = create<FlowState>()(
                   ...n,
                   data: {
                     ...n.data,
-                    schemas: (n.data.schemas ?? []).map((s) =>
+                    schemas: getNodeSchemas(n.data as SystemNodeData).map((s) =>
                       s.id === schemaId
                         ? { ...s, fields: s.fields.map((f) => (f.id === fieldId ? { ...f, ...updates } : f)) }
                         : s
@@ -337,7 +337,7 @@ export const useFlowStore = create<FlowState>()(
                   ...n,
                   data: {
                     ...n.data,
-                    schemas: (n.data.schemas ?? []).map((s) =>
+                    schemas: getNodeSchemas(n.data as SystemNodeData).map((s) =>
                       s.id === schemaId
                         ? { ...s, fields: s.fields.filter((f) => f.id !== fieldId) }
                         : s
@@ -465,7 +465,7 @@ export const useFlowStore = create<FlowState>()(
     }),
     {
       name: "flow-project",
-      version: 9,
+      version: 10,
       migrate: (_persistedState, _version) => ({
         projectId: ASSET_MANAGEMENT_TEMPLATE.id,
         projectName: ASSET_MANAGEMENT_TEMPLATE.name,
