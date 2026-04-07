@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import type { SystemNodeData, DataEdgeData } from "@/types/flow";
 import { ArrowLeft, Search, Database, Plus, Eye, Pencil } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function SchemaExplorer() {
   const nodes = useFlowStore((s) => s.nodes);
@@ -25,8 +26,14 @@ export function SchemaExplorer() {
   const searchParams = useSearchParams();
   const nodeParam = searchParams.get("node");
 
+  const router = useRouter();
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(nodeParam);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const selectNode = (id: string) => {
+    setSelectedNodeId(id);
+    router.replace(`/schemas?node=${id}`, { scroll: false });
+  };
 
   // Update selection when URL param changes
   useEffect(() => {
@@ -144,7 +151,7 @@ export function SchemaExplorer() {
               <button
                 key={i}
                 onClick={() => {
-                  setSelectedNodeId(r.nodeId);
+                  selectNode(r.nodeId);
                   setSearchQuery("");
                 }}
                 className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/[0.04] border border-white/[0.06] text-[10px] text-white/60 hover:bg-white/[0.08] transition-colors"
@@ -194,7 +201,7 @@ export function SchemaExplorer() {
                       return (
                         <button
                           key={node.id}
-                          onClick={() => setSelectedNodeId(node.id)}
+                          onClick={() => selectNode(node.id)}
                           className={`
                             flex items-center justify-between w-full px-4 py-2 text-left transition-colors
                             ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}
