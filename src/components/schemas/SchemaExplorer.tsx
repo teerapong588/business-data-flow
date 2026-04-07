@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useFlowStore, useDepartmentMap } from "@/store/useFlowStore";
 import { getNodeSchemas } from "@/lib/schema-utils";
 import { SchemaCard } from "./SchemaCard";
@@ -19,8 +20,16 @@ export function SchemaExplorer() {
   const editMode = useFlowStore((s) => s.editMode);
   const departmentMap = useDepartmentMap();
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const nodeParam = searchParams.get("node");
+
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(nodeParam);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Update selection when URL param changes
+  useEffect(() => {
+    if (nodeParam) setSelectedNodeId(nodeParam);
+  }, [nodeParam]);
 
   // Group nodes by department
   const nodesByDept = useMemo(() => {

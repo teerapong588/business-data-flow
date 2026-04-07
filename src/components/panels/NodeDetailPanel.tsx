@@ -6,16 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFlowStore, useDepartmentMap } from "@/store/useFlowStore";
+import { getNodeSchemas } from "@/lib/schema-utils";
 import { NodeEditForm } from "./NodeEditForm";
 import type { SystemNodeData } from "@/types/flow";
 import {
   ArrowDownRight,
   ArrowUpLeft,
   Clock,
+  Database,
   Radio,
   Shield,
   User,
 } from "lucide-react";
+import Link from "next/link";
 
 interface NodeDetailPanelProps {
   nodeId: string | null;
@@ -117,6 +120,25 @@ export function NodeDetailPanel({ nodeId, open, onClose }: NodeDetailPanelProps)
               {data.criticality} criticality
             </Badge>
           </div>
+
+          {/* View Schemas button */}
+          {(() => {
+            const schemas = getNodeSchemas(data);
+            return schemas.length > 0 ? (
+              <Link
+                href={`/schemas?node=${nodeId}`}
+                className="flex items-center gap-2 w-full px-3 py-2.5 mb-4 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.15] transition-all"
+              >
+                <Database size={14} className="text-blue-400" />
+                <span className="text-[11px] text-white/70 font-medium">
+                  View Schemas
+                </span>
+                <span className="text-[10px] text-white/30 ml-auto">
+                  {schemas.length} {schemas.length === 1 ? "schema" : "schemas"}
+                </span>
+              </Link>
+            ) : null;
+          })()}
 
           {/* Description */}
           <p className="text-white/60 text-xs leading-relaxed mb-5">
