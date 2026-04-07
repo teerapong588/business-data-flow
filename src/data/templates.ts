@@ -201,7 +201,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "market-data",
     type: "system",
-    position: { x: 0, y: 40 },
+    position: { x: 0, y: 0 },
     data: {
       label: "Market Data Feed",
       department: "external",
@@ -220,7 +220,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "pricing-service",
     type: "system",
-    position: { x: 0, y: 220 },
+    position: { x: 0, y: 180 },
     data: {
       label: "Pricing Service",
       department: "external",
@@ -239,7 +239,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "broker-dealer",
     type: "system",
-    position: { x: 0, y: 400 },
+    position: { x: 0, y: 360 },
     data: {
       label: "Broker / Dealer",
       department: "external",
@@ -258,7 +258,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "custodian",
     type: "system",
-    position: { x: 0, y: 580 },
+    position: { x: 0, y: 540 },
     data: {
       label: "Custodian",
       department: "external",
@@ -283,7 +283,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "oms",
     type: "system",
-    position: { x: 400, y: 40 },
+    position: { x: 450, y: 0 },
     data: {
       label: "Order Management",
       department: "fund-management",
@@ -302,7 +302,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "ems",
     type: "system",
-    position: { x: 400, y: 220 },
+    position: { x: 450, y: 160 },
     data: {
       label: "Execution Mgmt",
       department: "fund-management",
@@ -323,7 +323,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "pms",
     type: "system",
-    position: { x: 400, y: 420 },
+    position: { x: 450, y: 360 },
     data: {
       label: "Portfolio Mgmt",
       department: "fund-management",
@@ -344,7 +344,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "pre-trade-compliance",
     type: "system",
-    position: { x: 800, y: 0 },
+    position: { x: 900, y: 0 },
     data: {
       label: "Pre-Trade Compliance",
       department: "compliance",
@@ -365,7 +365,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "risk-platform",
     type: "system",
-    position: { x: 800, y: 170 },
+    position: { x: 450, y: 520 },
     data: {
       label: "Risk Platform",
       department: "fund-management",
@@ -386,7 +386,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "trade-matching",
     type: "system",
-    position: { x: 800, y: 340 },
+    position: { x: 1350, y: 0 },
     data: {
       label: "Trade Matching",
       department: "operations",
@@ -407,7 +407,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "trade-surveillance",
     type: "system",
-    position: { x: 800, y: 510 },
+    position: { x: 900, y: 180 },
     data: {
       label: "Trade Surveillance",
       department: "compliance",
@@ -428,7 +428,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "counterparty-risk",
     type: "system",
-    position: { x: 800, y: 660 },
+    position: { x: 450, y: 680 },
     data: {
       label: "Counterparty Risk",
       department: "fund-management",
@@ -449,7 +449,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "settlement",
     type: "system",
-    position: { x: 1200, y: 40 },
+    position: { x: 1350, y: 160 },
     data: {
       label: "Settlement",
       department: "operations",
@@ -470,7 +470,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "fund-accounting",
     type: "system",
-    position: { x: 1200, y: 220 },
+    position: { x: 1350, y: 360 },
     data: {
       label: "Fund Accounting",
       department: "operations",
@@ -491,7 +491,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "nav-engine",
     type: "system",
-    position: { x: 1200, y: 400 },
+    position: { x: 1350, y: 520 },
     data: {
       label: "NAV Calculation",
       department: "operations",
@@ -516,7 +516,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "corporate-actions",
     type: "system",
-    position: { x: 1200, y: 560 },
+    position: { x: 1350, y: 840 },
     data: {
       label: "Corporate Actions",
       department: "operations",
@@ -537,7 +537,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "reconciliation",
     type: "system",
-    position: { x: 1200, y: 720 },
+    position: { x: 1350, y: 1000 },
     data: {
       label: "Reconciliation",
       department: "operations",
@@ -558,7 +558,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "bara",
     type: "system",
-    position: { x: 1200, y: 880 },
+    position: { x: 1350, y: 680 },
     data: {
       label: "Portfolio Admin",
       department: "operations",
@@ -579,7 +579,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "kyc-aml",
     type: "system",
-    position: { x: 1200, y: 1040 },
+    position: { x: 900, y: 360 },
     data: {
       label: "KYC / AML",
       department: "compliance",
@@ -600,7 +600,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "client-reporting",
     type: "system",
-    position: { x: 1600, y: 100 },
+    position: { x: 450, y: 840 },
     data: {
       label: "Client Reporting",
       department: "fund-management",
@@ -621,7 +621,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "regulatory-reporting",
     type: "system",
-    position: { x: 1600, y: 350 },
+    position: { x: 900, y: 540 },
     data: {
       label: "Regulatory Reporting",
       department: "compliance",
@@ -642,7 +642,7 @@ const templateNodes: SystemFlowNode[] = [
   {
     id: "data-warehouse",
     type: "system",
-    position: { x: 1600, y: 600 },
+    position: { x: 1700, y: 0 },
     data: {
       label: "Data Warehouse",
       department: "technology",
