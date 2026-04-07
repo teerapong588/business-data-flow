@@ -70,13 +70,14 @@ export function SwimLaneBackground() {
               top: lane.bounds.y,
               width: lane.bounds.width,
               height: lane.bounds.height,
-              backgroundColor: `${lane.color}05`,
-              border: `1px solid ${lane.color}0a`,
+              backgroundColor: `${lane.color}20`,
+              border: `2px solid ${lane.color}50`,
+              boxShadow: `0 0 20px ${lane.color}10`,
             }}
           >
             <span
-              className="absolute top-2 left-3 text-[9px] uppercase tracking-wider font-medium"
-              style={{ color: `${lane.color}30` }}
+              className="absolute top-3 left-4 text-[12px] uppercase tracking-widest font-bold"
+              style={{ color: `${lane.color}aa` }}
             >
               {lane.label}
             </span>
@@ -93,13 +94,13 @@ export function SwimLaneBackground() {
               top: zone.bounds.y,
               width: zone.bounds.width,
               height: zone.bounds.height,
-              backgroundColor: `${zone.color}06`,
-              border: `1px dashed ${zone.color}12`,
+              backgroundColor: `${zone.color}15`,
+              border: `1px solid ${zone.color}40`,
             }}
           >
             <span
-              className="absolute top-1 left-2 text-[7px] uppercase tracking-wider font-medium"
-              style={{ color: `${zone.color}25` }}
+              className="absolute top-2 left-3 text-[9px] uppercase tracking-wider font-semibold"
+              style={{ color: `${zone.color}80` }}
             >
               {zone.label}
             </span>

@@ -279,7 +279,7 @@ export const useFlowStore = create<FlowState>()(
     }),
     {
       name: "flow-project",
-      version: 6,
+      version: 7,
       migrate: (_persistedState, _version) => ({
         projectId: ASSET_MANAGEMENT_TEMPLATE.id,
         projectName: ASSET_MANAGEMENT_TEMPLATE.name,

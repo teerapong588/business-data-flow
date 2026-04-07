@@ -17,8 +17,8 @@ export interface FunctionZone {
 
 const NODE_WIDTH = 200;
 const NODE_HEIGHT = 100;
-const DEPT_PADDING = 40;
-const FN_PADDING = 20;
+const DEPT_PADDING = 60;
+const FN_PADDING = 30;
 
 export function computeSwimLanes(
   nodes: SystemFlowNode[],
