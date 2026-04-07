@@ -302,7 +302,7 @@ export function SchemaExplorer() {
           {selectedNode && selectedData ? (
             <>
               {/* Selected system header */}
-              <div className="px-6 py-4 border-b border-white/[0.06]">
+              <div className="px-6 py-4 border-b border-white/[0.06] shrink-0">
                 <div className="flex items-center gap-3 mb-1">
                   <div
                     className="w-3 h-8 rounded-sm"
@@ -333,7 +333,7 @@ export function SchemaExplorer() {
                 </div>
               </div>
 
-              <ScrollArea className="flex-1 px-6 py-4">
+              <ScrollArea className="flex-1 min-h-0 px-6 py-4">
                 {selectedSchemas.length > 0 ? (
                   <div className="space-y-4 pb-8">
                     {selectedSchemas.map((schema) => (
