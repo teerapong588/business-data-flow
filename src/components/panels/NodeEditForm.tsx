@@ -15,8 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFlowStore } from "@/store/useFlowStore";
+import { getNodeSchemas } from "@/lib/schema-utils";
 import type { SystemFlowNode, SystemNodeData } from "@/types/flow";
-import { Trash2, X, Plus } from "lucide-react";
+import { Trash2, X, Plus, Database } from "lucide-react";
+import Link from "next/link";
 
 interface NodeEditFormProps {
   mode: "add" | "edit";
@@ -130,6 +132,25 @@ export function NodeEditForm({ mode, nodeId, open, onClose }: NodeEditFormProps)
 
         <ScrollArea className="h-[calc(100vh-120px)] px-6">
           <div className="space-y-4 pb-8">
+            {/* View Schemas link (edit mode only) */}
+            {mode === "edit" && nodeId && (() => {
+              const existingSchemas = existingData ? getNodeSchemas(existingData) : [];
+              return existingSchemas.length > 0 ? (
+                <Link
+                  href={`/schemas?node=${nodeId}`}
+                  className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.15] transition-all"
+                >
+                  <Database size={14} className="text-blue-400" />
+                  <span className="text-[11px] text-white/70 font-medium">
+                    View Schemas
+                  </span>
+                  <span className="text-[10px] text-white/30 ml-auto">
+                    {existingSchemas.length} {existingSchemas.length === 1 ? "schema" : "schemas"}
+                  </span>
+                </Link>
+              ) : null;
+            })()}
+
             {/* Label */}
             <div>
               <Label className="text-[10px] text-white/50 uppercase tracking-wider">
