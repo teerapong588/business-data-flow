@@ -1,0 +1,18 @@
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: business-data-flow
+build:
+  googleCloudBuild:
+    projectId: bcap-434608
+    diskSizeGb: 50
+    machineType: N1_HIGHCPU_8
+    concurrency: 5
+    serviceAccount: projects/bcap-434608/serviceAccounts/bcap-skaffold-build-sa@bcap-434608.iam.gserviceaccount.com
+  tagPolicy:
+    envTemplate:
+      template: "{{.VERSION}}"
+  artifacts:
+    - image: asia-southeast1-docker.pkg.dev/bcap-434608/business-data-flow/prod
+      kaniko: {}
+      context: .

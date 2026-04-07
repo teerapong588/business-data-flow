@@ -1,0 +1,60 @@
+name: Build and Deploy with Skaffold
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: bcap-434608
+  REGION: asia-southeast1
+  REPOSITORY: business-data-flow
+  VERSION: v0.0.${{ github.run_number }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up gcloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          chmod +x skaffold
+          sudo mv skaffold /usr/local/bin/
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      - name: Build with Skaffold
+        run: |
+          skaffold build --file-output=build.json
+        env:
+          VERSION: ${{ env.VERSION }}
+
+      - name: Update image version in Terraform
+        run: |
+          cd infra
+          sed -i "s|image = \".*\"|image = \"asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/prod:${{ env.VERSION }}\"|" main.tf
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: |
+          cd infra
+          terraform init
+
+      - name: Terraform Apply
+        run: |
+          cd infra
+          terraform apply -auto-approve
