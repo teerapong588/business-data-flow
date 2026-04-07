@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { nodes } from "@/data/nodes";
+import { useFlowStore } from "@/store/useFlowStore";
 import type { FreshnessInfo, FreshnessStatus, SystemNodeData } from "@/types/flow";
 
 function generateFreshness(nodeId: string, criticality: string, schedule: string): FreshnessInfo {
@@ -45,6 +45,8 @@ function generateFreshness(nodeId: string, criticality: string, schedule: string
 }
 
 export function useDataFreshness() {
+  const nodes = useFlowStore((s) => s.nodes);
+
   const [freshnessMap, setFreshnessMap] = useState<Map<string, FreshnessInfo>>(() => {
     const map = new Map<string, FreshnessInfo>();
     nodes.forEach((node) => {
@@ -54,22 +56,37 @@ export function useDataFreshness() {
     return map;
   });
 
+  // Re-generate when nodes change (add/remove)
+  useEffect(() => {
+    setFreshnessMap((prev) => {
+      const next = new Map<string, FreshnessInfo>();
+      nodes.forEach((node) => {
+        const data = node.data as SystemNodeData;
+        // Keep existing freshness if node already tracked
+        next.set(
+          node.id,
+          prev.get(node.id) ?? generateFreshness(node.id, data.criticality, data.schedule)
+        );
+      });
+      return next;
+    });
+  }, [nodes]);
+
   // Simulate live updates every 30s
   useEffect(() => {
+    if (nodes.length === 0) return;
     const interval = setInterval(() => {
       setFreshnessMap((prev) => {
         const next = new Map(prev);
-        // Randomly update 1-2 nodes
-        const nodeList = nodes;
-        const idx = Math.floor(Math.random() * nodeList.length);
-        const node = nodeList[idx];
+        const idx = Math.floor(Math.random() * nodes.length);
+        const node = nodes[idx];
         const data = node.data as SystemNodeData;
         next.set(node.id, generateFreshness(node.id, data.criticality, data.schedule));
         return next;
       });
     }, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [nodes]);
 
   return freshnessMap;
 }

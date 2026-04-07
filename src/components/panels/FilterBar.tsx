@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { departments } from "@/data/departments";
-import { flowTypes } from "@/data/flow-types";
+import { useFlowStore } from "@/store/useFlowStore";
 import { Department, FlowType } from "@/types/flow";
 import { RotateCcw, Play, Square } from "lucide-react";
 
@@ -27,6 +26,8 @@ export function FilterBar({
   isWalkthroughPlaying,
   onStopWalkthrough,
 }: FilterBarProps) {
+  const departments = useFlowStore((s) => s.departments);
+  const flowTypes = useFlowStore((s) => s.flowTypes);
   const hasFilters = activeDepartments.size > 0 || activeFlowType !== null;
 
   return (

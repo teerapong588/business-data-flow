@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { departments } from "@/data/departments";
+import { useFlowStore } from "@/store/useFlowStore";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 export function Legend() {
+  const departments = useFlowStore((s) => s.departments);
   const [collapsed, setCollapsed] = useState(false);
 
   return (

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { edges as allEdges } from "@/data/edges";
-import { nodes as allNodes } from "@/data/nodes";
+import { useFlowStore } from "@/store/useFlowStore";
 import type { FlowType, SystemNodeData } from "@/types/flow";
 
 export function useFlowWalkthrough() {
+  const allEdges = useFlowStore((s) => s.edges);
+  const allNodes = useFlowStore((s) => s.nodes);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentFlowType, setCurrentFlowType] = useState<FlowType | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);

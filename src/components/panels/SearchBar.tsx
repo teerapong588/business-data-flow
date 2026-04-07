@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { departmentMap } from "@/data/departments";
+import { useDepartmentMap } from "@/store/useFlowStore";
 import type { SystemFlowNode, SystemNodeData } from "@/types/flow";
 
 interface SearchBarProps {
@@ -19,6 +19,7 @@ export function SearchBar({
   onSearchChange,
   onSelectNode,
 }: SearchBarProps) {
+  const departmentMap = useDepartmentMap();
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);

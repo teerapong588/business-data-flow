@@ -2,11 +2,13 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { Department, FlowType } from "@/types/flow";
-import { nodes as allNodes } from "@/data/nodes";
-import { edges as allEdges } from "@/data/edges";
+import { useFlowStore } from "@/store/useFlowStore";
 import type { SystemNodeData, DataEdgeData } from "@/types/flow";
 
 export function useFlowFilters() {
+  const allNodes = useFlowStore((s) => s.nodes);
+  const allEdges = useFlowStore((s) => s.edges);
+
   const [activeDepartments, setActiveDepartments] = useState<Set<Department>>(
     new Set()
   );

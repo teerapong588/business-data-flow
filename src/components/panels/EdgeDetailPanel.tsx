@@ -5,10 +5,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { edges } from "@/data/edges";
-import { nodes } from "@/data/nodes";
-import { departmentMap } from "@/data/departments";
-import { flowTypes } from "@/data/flow-types";
+import { useFlowStore, useDepartmentMap } from "@/store/useFlowStore";
+import { EdgeEditForm } from "./EdgeEditForm";
 import type { DataEdgeData, SystemNodeData } from "@/types/flow";
 import { ArrowRight, Clock, Radio } from "lucide-react";
 
@@ -19,6 +17,17 @@ interface EdgeDetailPanelProps {
 }
 
 export function EdgeDetailPanel({ edgeId, open, onClose }: EdgeDetailPanelProps) {
+  const edges = useFlowStore((s) => s.edges);
+  const nodes = useFlowStore((s) => s.nodes);
+  const flowTypes = useFlowStore((s) => s.flowTypes);
+  const editMode = useFlowStore((s) => s.editMode);
+  const departmentMap = useDepartmentMap();
+
+  // In edit mode, show the edit form instead
+  if (editMode === "edit" && edgeId && open) {
+    return <EdgeEditForm edgeId={edgeId} open={open} onClose={onClose} />;
+  }
+
   if (!edgeId) return null;
 
   const edge = edges.find((e) => e.id === edgeId);

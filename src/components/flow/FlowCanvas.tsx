@@ -10,6 +10,9 @@ import {
   BackgroundVariant,
   useReactFlow,
   type Edge,
+  type Connection,
+  type NodeChange,
+  applyNodeChanges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -28,17 +31,30 @@ import { ExportButton } from "@/components/panels/ExportButton";
 import { EdgeTooltip } from "@/components/flow/edges/EdgeTooltip";
 import { SwimLaneBackground } from "@/components/flow/SwimLaneBackground";
 import { WalkthroughOverlay } from "@/components/panels/WalkthroughOverlay";
-import { DEPARTMENT_COLORS } from "@/lib/constants";
-import { nodes as allNodes } from "@/data/nodes";
-import { edges as allEdges } from "@/data/edges";
-import { flowPaths } from "@/data/flow-paths";
+import { EditToolbar } from "@/components/panels/EditToolbar";
+import { useFlowStore, useDepartmentMap, useFunctionMap } from "@/store/useFlowStore";
 import { useFlowWalkthrough } from "@/hooks/useFlowWalkthrough";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
-import type { SystemNodeData, DataEdgeData } from "@/types/flow";
+import type { SystemNodeData, DataEdgeData, DataFlowEdge } from "@/types/flow";
+import { Eye, Pencil } from "lucide-react";
 
 function FlowCanvasInner() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
+
+  // Store
+  const allNodes = useFlowStore((s) => s.nodes);
+  const allEdges = useFlowStore((s) => s.edges);
+  const flowPaths = useFlowStore((s) => s.flowPaths);
+  const editMode = useFlowStore((s) => s.editMode);
+  const setEditMode = useFlowStore((s) => s.setEditMode);
+  const storeAddEdge = useFlowStore((s) => s.addEdge);
+  const storeUpdateNodePosition = useFlowStore((s) => s.updateNodePosition);
+  const storeDeleteNode = useFlowStore((s) => s.deleteNode);
+  const storeDeleteEdge = useFlowStore((s) => s.deleteEdge);
+  const departmentMap = useDepartmentMap();
+  const functionMap = useFunctionMap();
+  const isEditMode = editMode === "edit";
 
   const { selectedNodeId, isDetailOpen, onNodeClick, closePanel } =
     useNodeSelection();
@@ -84,10 +100,13 @@ function FlowCanvasInner() {
     y: number;
   } | null>(null);
 
-  // Enrich nodes with freshness data + focused/walkthrough state
+  // Enrich nodes with freshness data + focused/walkthrough state + department config
   const enrichedNodes = useMemo(() => {
     return filteredNodes.map((node) => {
       const freshness = freshnessMap.get(node.id);
+      const nodeData = node.data as SystemNodeData;
+      const deptConfig = departmentMap[nodeData.department];
+      const fnConfig = nodeData.function ? functionMap[nodeData.function] : undefined;
       let className = node.className || "";
 
       if (focusedNodeId === node.id) {
@@ -111,10 +130,12 @@ function FlowCanvasInner() {
         data: {
           ...node.data,
           freshness,
+          departmentConfig: deptConfig,
+          functionConfig: fnConfig,
         },
       };
     });
-  }, [filteredNodes, freshnessMap, focusedNodeId, walkthrough.isPlaying, walkthrough.activeNodeId, walkthrough.visitedNodeIds]);
+  }, [filteredNodes, freshnessMap, focusedNodeId, walkthrough.isPlaying, walkthrough.activeNodeId, walkthrough.visitedNodeIds, departmentMap, functionMap]);
 
   // Enrich edges with walkthrough state
   const enrichedEdges = useMemo(() => {
@@ -162,20 +183,75 @@ function FlowCanvasInner() {
     [onEdgeClick, closePanel]
   );
 
+  // Handle connection creation in edit mode
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      if (!isEditMode || !connection.source || !connection.target) return;
+      const newEdge: DataFlowEdge = {
+        id: `e-${connection.source}-${connection.target}-${Date.now()}`,
+        source: connection.source,
+        target: connection.target,
+        data: {
+          label: "New Connection",
+          dataDescription: "",
+          frequency: "",
+          protocol: "",
+          flowTypes: [],
+        },
+      };
+      storeAddEdge(newEdge);
+      // Open edge detail panel for the new edge
+      closePanel();
+      onEdgeClick({} as React.MouseEvent, newEdge as Edge);
+    },
+    [isEditMode, storeAddEdge, closePanel, onEdgeClick]
+  );
+
+  // Handle node position changes in edit mode
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      if (!isEditMode) return;
+      changes.forEach((change) => {
+        if (change.type === "position" && change.position) {
+          storeUpdateNodePosition(change.id, change.position);
+        }
+      });
+    },
+    [isEditMode, storeUpdateNodePosition]
+  );
+
+  // Handle delete key in edit mode
+  useEffect(() => {
+    if (!isEditMode) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Delete" || e.key === "Backspace") {
+        // Don't delete if user is typing in an input
+        if ((e.target as HTMLElement)?.tagName === "INPUT" || (e.target as HTMLElement)?.tagName === "TEXTAREA") return;
+        if (selectedNodeId && isDetailOpen) {
+          storeDeleteNode(selectedNodeId);
+          closePanel();
+        } else if (selectedEdgeId && isEdgeDetailOpen) {
+          storeDeleteEdge(selectedEdgeId);
+          closeEdgePanel();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isEditMode, selectedNodeId, selectedEdgeId, isDetailOpen, isEdgeDetailOpen, storeDeleteNode, storeDeleteEdge, closePanel, closeEdgePanel]);
+
   // Track mouse position globally and auto-dismiss tooltip
   useEffect(() => {
     if (!edgeTooltip) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      // Check if we're still over an edge SVG element
       const isOverEdge = el?.closest('.react-flow__edge') !== null;
       if (!isOverEdge) {
         setEdgeTooltip(null);
       }
     };
 
-    // Small delay before attaching so the initial hover doesn't immediately dismiss
     const timeout = setTimeout(() => {
       document.addEventListener('mousemove', handleMouseMove);
     }, 50);
@@ -216,7 +292,12 @@ function FlowCanvasInner() {
   return (
     <div className="flex flex-col h-screen bg-[#0a0e1a]">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+      <div
+        className="flex items-center justify-between px-6 py-4 border-b transition-colors"
+        style={{
+          borderColor: isEditMode ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.06)",
+        }}
+      >
         <div>
           <h1 className="text-lg font-semibold text-white/90 tracking-tight">
             Asset Management Data Flow
@@ -226,7 +307,7 @@ function FlowCanvasInner() {
           </p>
         </div>
 
-        {/* Search + Export + Live */}
+        {/* Search + Edit Toggle + Export + Live */}
         <div className="flex items-center gap-3">
           <SearchBar
             nodes={allNodes}
@@ -234,6 +315,24 @@ function FlowCanvasInner() {
             onSearchChange={setSearchQuery}
             onSelectNode={handleSearchSelect}
           />
+
+          {/* Edit Mode Toggle */}
+          <button
+            onClick={() => setEditMode(isEditMode ? "view" : "edit")}
+            className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium
+              border transition-all duration-200
+              ${
+                isEditMode
+                  ? "border-blue-500/40 bg-blue-500/15 text-blue-400"
+                  : "border-white/[0.08] bg-white/[0.04] text-white/50 hover:text-white/70 hover:bg-white/[0.06]"
+              }
+            `}
+          >
+            {isEditMode ? <Pencil size={12} /> : <Eye size={12} />}
+            {isEditMode ? "Editing" : "View"}
+          </button>
+
           <ExportButton targetRef={reactFlowWrapper} />
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -258,6 +357,26 @@ function FlowCanvasInner() {
         onStopWalkthrough={walkthrough.stop}
       />
 
+      {/* Edit Toolbar */}
+      {isEditMode && (
+        <EditToolbar
+          selectedNodeId={selectedNodeId}
+          selectedEdgeId={selectedEdgeId}
+          onDeleteNode={() => {
+            if (selectedNodeId) {
+              storeDeleteNode(selectedNodeId);
+              closePanel();
+            }
+          }}
+          onDeleteEdge={() => {
+            if (selectedEdgeId) {
+              storeDeleteEdge(selectedEdgeId);
+              closeEdgePanel();
+            }
+          }}
+        />
+      )}
+
       {/* Canvas */}
       <div className="flex-1 relative" ref={reactFlowWrapper}>
         <ReactFlow
@@ -271,10 +390,14 @@ function FlowCanvasInner() {
           onEdgeClick={handleEdgeClick}
           onEdgeMouseEnter={handleEdgeMouseEnter}
           onEdgeMouseLeave={handleEdgeMouseLeave}
+          onConnect={isEditMode ? handleConnect : undefined}
+          onNodesChange={isEditMode ? handleNodesChange : undefined}
           fitView
           fitViewOptions={{ padding: 0.15 }}
-          nodesDraggable={false}
-          nodesConnectable={false}
+          nodesDraggable={isEditMode}
+          nodesConnectable={isEditMode}
+          snapToGrid={isEditMode}
+          snapGrid={[40, 40]}
           defaultEdgeOptions={{ type: "animated" }}
           minZoom={0.2}
           maxZoom={2}
@@ -297,7 +420,7 @@ function FlowCanvasInner() {
             className="!bottom-20 !left-4"
             nodeColor={(node) => {
               const dept = (node.data as SystemNodeData)?.department;
-              return dept ? DEPARTMENT_COLORS[dept] ?? "#64748b" : "#64748b";
+              return dept ? departmentMap[dept]?.color ?? "#64748b" : "#64748b";
             }}
             maskColor="rgba(10, 14, 26, 0.85)"
             style={{

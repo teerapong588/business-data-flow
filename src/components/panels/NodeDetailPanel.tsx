@@ -5,9 +5,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { nodes } from "@/data/nodes";
-import { edges } from "@/data/edges";
-import { departmentMap } from "@/data/departments";
+import { useFlowStore, useDepartmentMap } from "@/store/useFlowStore";
+import { NodeEditForm } from "./NodeEditForm";
 import type { SystemNodeData } from "@/types/flow";
 import {
   ArrowDownRight,
@@ -25,6 +24,16 @@ interface NodeDetailPanelProps {
 }
 
 export function NodeDetailPanel({ nodeId, open, onClose }: NodeDetailPanelProps) {
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const editMode = useFlowStore((s) => s.editMode);
+  const departmentMap = useDepartmentMap();
+
+  // In edit mode, show the edit form instead
+  if (editMode === "edit" && nodeId && open) {
+    return <NodeEditForm mode="edit" nodeId={nodeId} open={open} onClose={onClose} />;
+  }
+
   if (!nodeId) return null;
 
   const node = nodes.find((n) => n.id === nodeId);

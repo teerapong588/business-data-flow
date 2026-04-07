@@ -3,8 +3,7 @@
 import React, { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { Badge } from "@/components/ui/badge";
-import { departmentMap } from "@/data/departments";
-import { SystemNodeData } from "@/types/flow";
+import { SystemNodeData, DepartmentConfig, BusinessFunctionConfig } from "@/types/flow";
 import { FreshnessDot } from "./FreshnessDot";
 import type { FreshnessInfo } from "@/types/flow";
 import {
@@ -16,6 +15,9 @@ import {
   BarChart3,
   Server,
   Globe,
+  Database,
+  Briefcase,
+  FileText,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -27,14 +29,20 @@ const iconMap: Record<string, React.ElementType> = {
   BarChart3,
   Server,
   Globe,
+  Database,
+  Briefcase,
+  FileText,
 };
 
 function SystemNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as SystemNodeData;
   const freshness = (data as unknown as { freshness?: FreshnessInfo }).freshness;
-  const dept = departmentMap[nodeData.department];
+  // Department + function config passed via enriched data from FlowCanvas
+  const dept = (data as unknown as { departmentConfig?: DepartmentConfig }).departmentConfig;
+  const fn = (data as unknown as { functionConfig?: BusinessFunctionConfig }).functionConfig;
   const Icon = iconMap[dept?.icon ?? "Server"] ?? Server;
   const color = dept?.color ?? "#64748b";
+  const fnColor = fn?.color ?? color;
   const isHighCriticality = nodeData.criticality === "high";
 
   return (
@@ -86,7 +94,7 @@ function SystemNodeComponent({ data, selected }: NodeProps) {
         </p>
 
         {/* Footer */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <Badge
             variant="secondary"
             className="text-[8px] px-1.5 py-0 h-4 border-0"
@@ -97,6 +105,18 @@ function SystemNodeComponent({ data, selected }: NodeProps) {
           >
             {dept?.label ?? nodeData.department}
           </Badge>
+          {fn && (
+            <Badge
+              variant="secondary"
+              className="text-[7px] px-1 py-0 h-3.5 border-0"
+              style={{
+                backgroundColor: `${fnColor}15`,
+                color: fnColor,
+              }}
+            >
+              {fn.label}
+            </Badge>
+          )}
           {/* Criticality dot */}
           <div
             className="w-1.5 h-1.5 rounded-full ml-auto"
