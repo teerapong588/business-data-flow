@@ -18,6 +18,7 @@ import type {
   FlowProject,
 } from "@/types/flow";
 import { ASSET_MANAGEMENT_TEMPLATE } from "@/data/templates";
+import { getNodeSchemas } from "@/lib/schema-utils";
 
 function generateGlowFromColor(hex: string): {
   glowColor: string;
@@ -244,7 +245,7 @@ export const useFlowStore = create<FlowState>()(
         set((state) => ({
           nodes: state.nodes.map((n) =>
             n.id === nodeId
-              ? { ...n, data: { ...n.data, schemas: [...(n.data.schemas ?? []), schema] } }
+              ? { ...n, data: { ...n.data, schemas: [...getNodeSchemas(n.data as SystemNodeData), schema] } }
               : n
           ),
         })),
