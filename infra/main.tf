@@ -1,7 +1,6 @@
 provider "google" {
-  project     = "bcap-434608"
-  region      = "asia-southeast1"
-  credentials = file("../service-account.json")
+  project = "bcap-434608"
+  region  = "asia-southeast1"
 }
 
 resource "google_artifact_registry_repository" "business_data_flow" {
