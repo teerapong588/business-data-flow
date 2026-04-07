@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { SystemNodeData, DataEdgeData } from "@/types/flow";
-import { ArrowLeft, Search, Database, Plus } from "lucide-react";
+import { ArrowLeft, Search, Database, Plus, Eye, Pencil } from "lucide-react";
 import Link from "next/link";
 
 export function SchemaExplorer() {
@@ -18,7 +18,9 @@ export function SchemaExplorer() {
   const edges = useFlowStore((s) => s.edges);
   const departments = useFlowStore((s) => s.departments);
   const editMode = useFlowStore((s) => s.editMode);
+  const setEditMode = useFlowStore((s) => s.setEditMode);
   const departmentMap = useDepartmentMap();
+  const isEditMode = editMode === "edit";
 
   const searchParams = useSearchParams();
   const nodeParam = searchParams.get("node");
@@ -101,16 +103,35 @@ export function SchemaExplorer() {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] w-64">
-          <Search size={12} className="text-white/30" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search schemas and fields..."
-            className="bg-transparent text-[11px] text-white/80 placeholder:text-white/25 outline-none w-full"
-          />
+        <div className="flex items-center gap-3">
+          {/* Search */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] w-64">
+            <Search size={12} className="text-white/30" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search schemas and fields..."
+              className="bg-transparent text-[11px] text-white/80 placeholder:text-white/25 outline-none w-full"
+            />
+          </div>
+
+          {/* Edit Mode Toggle */}
+          <button
+            onClick={() => setEditMode(isEditMode ? "view" : "edit")}
+            className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium
+              border transition-all duration-200
+              ${
+                isEditMode
+                  ? "border-blue-500/40 bg-blue-500/15 text-blue-400"
+                  : "border-white/[0.08] bg-white/[0.04] text-white/50 hover:text-white/70 hover:bg-white/[0.06]"
+              }
+            `}
+          >
+            {isEditMode ? <Pencil size={12} /> : <Eye size={12} />}
+            {isEditMode ? "Editing" : "View"}
+          </button>
         </div>
       </div>
 
