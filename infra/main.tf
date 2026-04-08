@@ -52,19 +52,6 @@ resource "google_cloud_run_service_iam_member" "invoker" {
   member   = "allUsers"
 }
 
-# Grant artifact registry reader permission to the service account
-resource "google_project_iam_member" "artifact_registry_permissions" {
-  project = "bcap-434608"
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:bcap-434608@appspot.gserviceaccount.com"
-}
-
-# Ensure the user or account running Terraform has permission to act as the service account
-resource "google_project_iam_member" "service_account_user" {
-  project = "bcap-434608"
-  role    = "roles/iam.serviceAccountUser"
-  member  = "user:teerapong.intoom@gmail.com"
-}
 
 output "cloud_run_url" {
   value = google_cloud_run_service.business_data_flow.status[0].url
